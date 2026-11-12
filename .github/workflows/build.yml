@@ -1,5 +1,5 @@
 name: Build Fazlaka Pay APK
-on: [push]
+on: push
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,10 +12,10 @@ jobs:
           distribution: 'temurin'
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-      - name: Build APK
-        run: |
-          chmod +x gradlew || echo "no gradlew"
-          if [ -f gradlew ]; then ./gradlew assembleDebug; else gradle assembleDebug; fi
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Build Debug APK
+        run: gradle assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
