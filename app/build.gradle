@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
-
 android {
     namespace 'com.fazlaka.pay'
     compileSdk 34
@@ -26,8 +25,11 @@ android {
         jvmTarget = '17'
     }
 }
-
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core-ktx:1.12.0'
 }
+
+=== 4 - gradle.properties ===
+org.gradle.jvmargs=-Xmx2048m
+android.useAndroidX=true
