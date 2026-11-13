@@ -3,6 +3,9 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-24.04
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK 17
@@ -10,8 +13,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
