@@ -63,11 +63,22 @@ var D=JSON.parse(localStorage.getItem('fz2')||'null')||{pin:'4440',fingerprintEn
 if(!D.setupDone)document.getElementById('setup').classList.remove('hide');
 function save(){localStorage.setItem('fz2',JSON.stringify(D));
 async function tryFingerprint(){
-  if(!D.fingerprintEnabled) return document.getElementById('fpMsg').textContent='البصمة مش مفعلة - فعلها من التقارير بعد ما تدخل';
-  try{ if(window.PublicKeyCredential){ await navigator.credentials.get({publicKey:{challenge:new Uint8Array(32),allowCredentials:[],userVerification:'required',timeout:30000}}); } document.getElementById('lock').style.display='none'; lastAct=Date.now(); }
-  catch(e){ document.getElementById('fpMsg').textContent='حط بصمتك على الجهاز...'; setTimeout(()=>{ document.getElementById('lock').style.display='none'; lastAct=Date.now(); }, 800); }
+  if(!D.fingerprintEnabled) return document.getElementById('fpMsg').textContent='البصمة مش مفعلة - فعلها من التقارير بعد ما تدخل بالرقم السري';
+  if(!window.PublicKeyCredential) return document.getElementById('fpMsg').textContent='البصمة الحقيقية مش مدعومة هنا - ادخل بالرقم السري';
+  try{
+    await navigator.credentials.get({publicKey:{challenge:new Uint8Array(32),allowCredentials:[],userVerification:'required',timeout:30000}});
+    document.getElementById('lock').style.display='none'; lastAct=Date.now();
+  }catch(e){
+    document.getElementById('fpMsg').textContent='البصمة ماتطابقتش - جرب تاني أو ادخل بالرقم السري';
+  }
 }
-async function enableFingerprint(){ try{ if(window.PublicKeyCredential){ await navigator.credentials.create({publicKey:{challenge:new Uint8Array(32),rp:{name:'Fazlaka Pay'},user:{id:new Uint8Array([1]),name:'user',displayName:'Fazlaka'},pubKeyCredParams:[{alg:-7,type:'public-key'}],authenticatorSelection:{userVerification:'required'},timeout:30000}}); } }catch(e){} D.fingerprintEnabled=true; save(); document.getElementById('fpStatus').textContent='البصمة اتفعلت ✅'; }
+async function enableFingerprint(){
+  if(!window.PublicKeyCredential) return document.getElementById('fpStatus').textContent='البصمة الحقيقية مش مدعومة هنا';
+  try{
+    await navigator.credentials.create({publicKey:{challenge:new Uint8Array(32),rp:{name:'Fazlaka Pay'},user:{id:new Uint8Array([1]),name:'user',displayName:'Fazlaka'},pubKeyCredParams:[{alg:-7,type:'public-key'}],authenticatorSelection:{userVerification:'required'},timeout:30000}});
+    D.fingerprintEnabled=true; save(); document.getElementById('fpStatus').textContent='البصمة اتفعلت ✅ - بصمة حقيقية';
+  }catch(e){ document.getElementById('fpStatus').textContent='البصمة ماتسجلتش - جرب تاني'; }
+}
 function disableFingerprint(){ D.fingerprintEnabled=false; save(); document.getElementById('fpStatus').textContent='البصمة اتلغت'; }
 function resetPin(){ if(confirm('هترجع الرقم السري للافتراضي؟')){ D.pin='4440'; save(); alert('اترجع - جرب تدخل دلوقتي'); } }
 
@@ -108,11 +119,22 @@ function editWallet(k){var v=prompt('رصيد جديد لـ '+k, D.wallets[k]);i
 function delWalletTx(k){D.sales=D.sales.filter(x=>!x.type.includes(k));save();}
 
 async function tryFingerprint(){
-  if(!D.fingerprintEnabled) return document.getElementById('fpMsg').textContent='البصمة مش مفعلة - فعلها من التقارير بعد ما تدخل';
-  try{ if(window.PublicKeyCredential){ await navigator.credentials.get({publicKey:{challenge:new Uint8Array(32),allowCredentials:[],userVerification:'required',timeout:30000}}); } document.getElementById('lock').style.display='none'; lastAct=Date.now(); }
-  catch(e){ document.getElementById('fpMsg').textContent='حط بصمتك على الجهاز...'; setTimeout(()=>{ document.getElementById('lock').style.display='none'; lastAct=Date.now(); }, 800); }
+  if(!D.fingerprintEnabled) return document.getElementById('fpMsg').textContent='البصمة مش مفعلة - فعلها من التقارير بعد ما تدخل بالرقم السري';
+  if(!window.PublicKeyCredential) return document.getElementById('fpMsg').textContent='البصمة الحقيقية مش مدعومة هنا - ادخل بالرقم السري';
+  try{
+    await navigator.credentials.get({publicKey:{challenge:new Uint8Array(32),allowCredentials:[],userVerification:'required',timeout:30000}});
+    document.getElementById('lock').style.display='none'; lastAct=Date.now();
+  }catch(e){
+    document.getElementById('fpMsg').textContent='البصمة ماتطابقتش - جرب تاني أو ادخل بالرقم السري';
+  }
 }
-async function enableFingerprint(){ try{ if(window.PublicKeyCredential){ await navigator.credentials.create({publicKey:{challenge:new Uint8Array(32),rp:{name:'Fazlaka Pay'},user:{id:new Uint8Array([1]),name:'user',displayName:'Fazlaka'},pubKeyCredParams:[{alg:-7,type:'public-key'}],authenticatorSelection:{userVerification:'required'},timeout:30000}}); } }catch(e){} D.fingerprintEnabled=true; save(); document.getElementById('fpStatus').textContent='البصمة اتفعلت ✅'; }
+async function enableFingerprint(){
+  if(!window.PublicKeyCredential) return document.getElementById('fpStatus').textContent='البصمة الحقيقية مش مدعومة هنا';
+  try{
+    await navigator.credentials.create({publicKey:{challenge:new Uint8Array(32),rp:{name:'Fazlaka Pay'},user:{id:new Uint8Array([1]),name:'user',displayName:'Fazlaka'},pubKeyCredParams:[{alg:-7,type:'public-key'}],authenticatorSelection:{userVerification:'required'},timeout:30000}});
+    D.fingerprintEnabled=true; save(); document.getElementById('fpStatus').textContent='البصمة اتفعلت ✅ - بصمة حقيقية';
+  }catch(e){ document.getElementById('fpStatus').textContent='البصمة ماتسجلتش - جرب تاني'; }
+}
 function disableFingerprint(){ D.fingerprintEnabled=false; save(); document.getElementById('fpStatus').textContent='البصمة اتلغت'; }
 function resetPin(){ if(confirm('هترجع الرقم السري للافتراضي؟')){ D.pin='4440'; save(); alert('اترجع - جرب تدخل دلوقتي'); } }
 
