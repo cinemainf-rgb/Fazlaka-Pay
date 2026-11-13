@@ -2,115 +2,65 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fazlaka Pay</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fazlaka Pay - فزلكا</title>
 <style>
-*{box-sizing:border-box}body{font-family:sans-serif;margin:0;background:#fff;color:#111;padding-bottom:90px}
-header{text-align:center;padding:18px 10px 8px}header h1{margin:0;font-size:32px}header p{margin:6px 0;color:#555}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#111;padding:8px;gap:6px;z-index:10}
-nav button{flex:1;background:#fff;color:#111;border:0;padding:12px 4px;border-radius:10px;font-size:13px;font-weight:bold}
-.tab{display:none;padding:12px}.tab.active{display:block}
-.card{border:1px solid #111;border-radius:14px;padding:12px;margin:10px 0}
-.card h3{margin:0 0 8px}
-input,select{width:100%;padding:12px;margin:6px 0;border:1px solid #111;border-radius:10px;font-size:16px;background:#fff}
-button{padding:13px;margin:6px 0;border:0;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer}
-.btn-black{background:#111;color:#fff;width:100%}.btn-white{background:#fff;color:#111;border:1px solid #111;width:100%}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.small{font-size:13px;color:#555}.log{font-size:14px;border-top:1px dashed #999;padding:6px 0}
-.badge{display:inline-block;background:#111;color:#fff;padding:3px 10px;border-radius:20px;font-size:12px}
-#printArea{width:58mm;margin:0 auto;text-align:center;font-family:monospace;color:#000;background:#fff;padding:8px}
-#printArea hr{border-top:1px dashed #000}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Tahoma;background:#f1f5f9;color:#0f172a}header{background:#0f172a;color:#fff;padding:18px 16px}header h1{margin:0;font-size:21px}.wrap{padding:14px;max-width:760px;margin:auto}.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:12px}.big{font-size:28px;font-weight:800}.muted{color:#64748b;font-size:13px}.row{display:flex;gap:10px}.row>div{flex:1;background:#f8fafc;border-radius:12px;padding:10px;text-align:center}input,select,button{width:100%;padding:12px;border-radius:12px;border:1px solid #cbd5e1;font-size:15px;margin-top:8px}button{background:#0f172a;color:#fff;border:0;font-weight:700;cursor:pointer}button.ghost{background:#e2e8f0;color:#0f172a}button.green{background:#16a34a}.small{font-size:12px;padding:6px 10px;width:auto}.flex{display:flex;gap:8px;align-items:center}.item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #eef2f7}.machine{flex:1;text-align:center;padding:12px;border-radius:12px;cursor:pointer;border:2px solid #e2e8f0;background:#f8fafc}.machine.sel{border-color:#16a34a;background:#f0fdf4}.catBtn{flex:1 0 18%;min-width:58px;padding:10px 8px;background:#f8fafc;color:#0f172a;border:2px solid #e2e8f0;border-radius:12px;font-weight:700}.catBtn.sel{background:#16a34a;color:#fff;border-color:#16a34a}.walletCard{background:#f8fafc;border:2px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:10px}.walletHead{display:flex;justify-content:space-between;align-items:center}.walletName{font-size:17px;font-weight:800}.walletLimit{font-size:12px;color:#64748b;background:#fff;border:1px solid #e2e8f0;padding:4px 8px;border-radius:20px}.walletBal{font-size:26px;font-weight:800;color:#0e7490;margin:8px 0 2px}.walletStats{display:flex;gap:8px;margin:8px 0}.walletStats div{flex:1;background:#fff;border-radius:10px;padding:8px;text-align:center;font-size:13px}.walletStats b{display:block;font-size:15px}.walletBtns{display:flex;gap:8px;margin-top:10px}.walletBtns button{flex:1}body.hide-nums .big,body.hide-nums .card b{filter:blur(7px)}body.big-font{font-size:19px}body.big-font button,body.big-font input,body.big-font select{font-size:19px;padding:16px}body.big-font .walletBal{font-size:32px}
 </style>
 </head>
 <body>
-<header><h1>Fazlaka Pay</h1><p>فزلكا - كل يوم معاك</p></header>
-
-<div id="lockScreen" class="tab active" style="text-align:center;padding:30px">
-<h2>قفل البرنامج</h2><p class="small">ادخل الرقم السري - اول مرة : 1234</p>
-<input id="passInput" type="password" placeholder="الرقم السري" inputmode="numeric">
-<button class="btn-black" onclick="unlock()">دخول</button>
-<p class="small" id="lockMsg"></p>
+<div id="pinLock" style="display:none;position:fixed;inset:0;background:#0f172a;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center">
+<div style="font-size:50px">🔒</div>
+<h2 style="color:#fff;margin:0">المتجر مقفول</h2>
+<p style="color:#94a3b8;margin:0">اكتب الرقم السري عشان تفتح</p>
+<input id="pinInput" type="password" inputmode="numeric" placeholder="الرقم السري" style="max-width:280px;text-align:center;font-size:22px">
+<button class="green" style="max-width:280px" onclick="unlockPin()">افتح 🔓</button>
+<div id="pinErr" style="color:#f87171"></div>
 </div>
-
-<div id="cash" class="tab"><h2>الكاش - المحافظ</h2>
-<div class="card"><h3>إضافة محفظة جديدة</h3>
-<input id="newWalletName" placeholder="اسم المحفظة - مثلا فودافون كاش">
-<select id="newWalletType"><option value="200000">محفظة عادية - حد 200000</option><option value="400000">انستا باي - حد 400000</option><option value="200000">فوري - حد 200000</option><option value="999999999">كاش اوت - بدون حد</option></select>
-<button class="btn-black" onclick="addWallet()">إضافة محفظة</button></div>
-<div id="wallets"></div>
-<div class="card"><h3>حركة كاش</h3>
-<select id="cashWallet"></select>
-<input id="cashAmount" type="number" placeholder="المبلغ">
-<input id="cashPerson" placeholder="من / إلى - اسم الشخص">
-<label><input type="checkbox" id="cashAjal"> آجل - يتسجل دين على العميل</label>
-<div style="display:flex;gap:8px"><button class="btn-black" onclick="cashIn()">دخول - وارد</button><button class="btn-white" onclick="cashOut()">خروج - صادر</button></div>
-<p class="small">لو آجل مش متعلم، المبلغ يتحصل. لو متعلم، يتسجل آجل باسم العميل.</p></div>
-<div id="cashLogs"></div></div>
-
-<div id="sell" class="tab"><h2>بيع - كروت</h2><p class="small">اضغط على الفئة، تتسجل آجل على العميل تلقائيا وتضاف للديون</p>
-<input id="sellCustomer" placeholder="اسم العميل">
-<div class="grid">
-<button class="btn-black" onclick="sellCard(20)">20</button>
-<button class="btn-black" onclick="sellCard(50)">50</button>
-<button class="btn-black" onclick="sellCard(100)">100</button>
-<button class="btn-black" onclick="sellCard(150)">150</button>
-<button class="btn-black" onclick="sellCard(200)">200</button>
+<header><h1>🏪 Fazlaka Pay</h1></header>
+<div class="wrap">
+<div id="dailyReminder"></div>
+<div class="flex" style="justify-content:flex-end">
+<button onclick="toggleBigFont()" style="width:36px;height:36px;padding:0;border-radius:50%;background:#fff;color:#000">A+</button>
+<button onclick="toggleHide()" style="width:36px;height:36px;padding:0;border-radius:50%;background:#fff;color:#000">👁️</button>
 </div>
-<div id="sellLog"></div></div>
-
-<div id="bills" class="tab"><h2>دفع فواتير</h2>
 <div class="card">
-<select id="billService"><option>كهرباء</option><option>مياه</option><option>غاز</option><option>نت</option><option>شحن</option><option>ارضي</option><option>خدمة اخرى</option></select>
-<input id="billCustomerNo" placeholder="رقم العميل / رقم الخدمة">
-<input id="billAmount" type="number" placeholder="المبلغ المستحق">
-<input id="billFee" type="number" placeholder="رسوم الخدمة">
-<input id="billTotal" type="number" placeholder="الاجمالي - احسبه انت">
-<input id="billDate" type="datetime-local">
-<button class="btn-black" onclick="saveBill()">حفظ وطباعة الوصل</button></div>
-<div id="billsLog"></div></div>
-
-<div id="debts" class="tab"><h2>الديون - الآجل</h2>
-<input id="debtSearch" placeholder="ابحث باسم العميل" oninput="render()">
-<div id="debtsList"></div>
-<div class="card"><h3>سداد دين</h3><input id="payDebtName" placeholder="اسم العميل"><input id="payDebtAmount" type="number" placeholder="المبلغ المسدد"><button class="btn-black" onclick="payDebt()">سداد</button></div></div>
-
-<div id="reports" class="tab"><h2>تقارير</h2><div id="reportBox"></div>
-<div style="display:flex;gap:8px"><button class="btn-black" onclick="exportBackup()">نسخ احتياطي - تحميل</button><button class="btn-white" onclick="document.getElementById('importFile').click()">استيراد</button></div>
-<input type="file" id="importFile" hidden onchange="importBackup(event)">
-<button class="btn-white" onclick="shareWhatsApp()">مشاركة على واتساب</button>
-<button class="btn-white" onclick="clearAll()">مسح كل البيانات</button></div>
-
-<div id="printArea" style="display:none"></div>
-
-<nav><button onclick="showTab('cash')" id="btn-cash">الكاش</button><button onclick="showTab('sell')" id="btn-sell">بيع</button><button onclick="showTab('bills')" id="btn-bills">فواتير</button><button onclick="showTab('debts')" id="btn-debts">ديون</button><button onclick="showTab('reports')" id="btn-reports">تقارير</button></nav>
-
-<script>
-let DB = JSON.parse(localStorage.getItem('fazlaka_db')||'{"wallets":[],"tx":[],"debts":{},"bills":[],"sales":[]}');
-let PASS = localStorage.getItem('fazlaka_pass')||'1234';
-function save(){localStorage.setItem('fazlaka_db',JSON.stringify(DB));render();}
-function unlock(){if(document.getElementById('passInput').value===PASS){document.getElementById('lockScreen').classList.remove('active');showTab('cash');}else{document.getElementById('lockMsg').innerText='الرقم غلط';}}
-function showTab(id){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});document.getElementById(id).classList.add('active');render();}
-function addWallet(){let n=document.getElementById('newWalletName').value.trim();if(!n)return alert('اكتب اسم المحفظة');let limit=parseInt(document.getElementById('newWalletType').value);DB.wallets.push({name:n,limit:limit,in:0,out:0});document.getElementById('newWalletName').value='';save();}
-function cashIn(){doCash('in')} function cashOut(){doCash('out')}
-function doCash(type){let wi=document.getElementById('cashWallet').value;let amt=parseFloat(document.getElementById('cashAmount').value);let person=document.getElementById('cashPerson').value.trim()||'عميل';let ajal=document.getElementById('cashAjal').checked;if(!amt||isNaN(amt))return alert('اكتب المبلغ');let w=DB.wallets[wi];if(!w)return alert('اضف محفظة الاول');if(type==='in')w.in+=amt;else w.out+=amt;DB.tx.push({wallet:w.name,amt:amt,type:type,person:person,ajal:ajal,date:new Date().toLocaleString('ar-EG')});if(ajal){DB.debts[person]=(DB.debts[person]||0)+amt;}document.getElementById('cashAmount').value='';save();alert('تم');}
-function deleteLast(walletName){for(let i=DB.tx.length-1;i>=0;i--){if(DB.tx[i].wallet===walletName){let t=DB.tx[i];let w=DB.wallets.find(function(x){return x.name===walletName});if(t.type==='in')w.in-=t.amt;else w.out-=t.amt;if(t.ajal)DB.debts[t.person]=(DB.debts[t.person]||0)-t.amt;DB.tx.splice(i,1);break;}}save();}
-function sellCard(amt){let cust=document.getElementById('sellCustomer').value.trim()||'عميل';DB.sales.push({amt:amt,customer:cust,date:new Date().toLocaleString('ar-EG')});DB.debts[cust]=(DB.debts[cust]||0)+amt;save();alert('تم بيع كارت '+amt+' آجل على '+cust);}
-function saveBill(){let s=document.getElementById('billService').value;let no=document.getElementById('billCustomerNo').value;let amt=document.getElementById('billAmount').value;let fee=document.getElementById('billFee').value;let total=document.getElementById('billTotal').value;let date=document.getElementById('billDate').value||new Date().toLocaleString('ar-EG');DB.bills.push({service:s,no:no,amt:amt,fee:fee,total:total,date:date});save();printReceipt(s,no,amt,fee,total,date);}
-function printReceipt(s,no,amt,fee,total,date){let el=document.getElementById('printArea');el.style.display='block';el.innerHTML='<h2>Fazlaka</h2><p>فزلكا - كل يوم معاك</p><hr><p>الخدمة: '+s+'</p><p>رقم العميل: '+no+'</p><p>المبلغ المستحق: '+amt+'</p><p>رسوم الخدمة: '+fee+'</p><p><b>الاجمالي: '+total+'</b></p><p>التاريخ: '+date+'</p><hr><p>Fazlaka - كل يوم معاك</p>';window.print();setTimeout(function(){el.style.display='none';},800);}
-function payDebt(){let n=document.getElementById('payDebtName').value.trim();let a=parseFloat(document.getElementById('payDebtAmount').value);if(!n||!a)return alert('اكتب الاسم والمبلغ');DB.debts[n]=Math.max(0,(DB.debts[n]||0)-a);save();alert('تم السداد');}
-function exportBackup(){let blob=new Blob([JSON.stringify(DB)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fazlaka-backup.json';a.click();}
-function importBackup(e){let r=new FileReader();r.onload=function(){DB=JSON.parse(r.result);save();alert('تم الاستيراد')};r.readAsText(e.target.files[0]);}
-function shareWhatsApp(){let total=Object.values(DB.debts).reduce(function(a,b){return a+b},0);window.open('https://wa.me/?text='+encodeURIComponent('Fazlaka Pay - اجمالي الديون: '+total));}
-function clearAll(){if(confirm('مسح كل البيانات؟')){localStorage.removeItem('fazlaka_db');location.reload();}}
-function render(){
-let wDiv=document.getElementById('wallets');let sel=document.getElementById('cashWallet');
-if(wDiv){wDiv.innerHTML='';sel.innerHTML='';DB.wallets.forEach(function(w,i){sel.innerHTML+='<option value="'+i+'">'+w.name+'</option>';let rem=w.limit-(w.out-w.in);wDiv.innerHTML+='<div class="card"><h3>'+w.name+' <span class="badge">حد '+w.limit+'</span></h3><p>وارد: '+w.in+' | صادر: '+w.out+' | المتبقي: '+rem+'</p><button class="btn-white" onclick="deleteLast(\''+w.name+'\')">حذف اخر حركة</button></div>';});}
-let logs=document.getElementById('cashLogs');if(logs){logs.innerHTML='<h3>سجل الحركات</h3>'+DB.tx.slice().reverse().map(function(t){return '<div class="log">'+t.date+' - '+t.wallet+' - '+(t.type==='in'?'دخول':'خروج')+' - '+t.amt+' - '+t.person+(t.ajal?' - آجل':'')+'</div>'}).join('');}
-let sl=document.getElementById('sellLog');if(sl){sl.innerHTML='<h3>سجل البيع</h3>'+DB.sales.slice().reverse().map(function(s){return '<div class="log">'+s.date+' - كارت '+s.amt+' - '+s.customer+' - آجل</div>'}).join('');}
-let bl=document.getElementById('billsLog');if(bl){bl.innerHTML='<h3>سجل الفواتير</h3>'+DB.bills.slice().reverse().map(function(b){return '<div class="log">'+b.service+' - '+b.no+' - اجمالي '+b.total+' - '+b.date+' <button onclick="printReceipt(\''+b.service+'\',\''+b.no+'\',\''+b.amt+'\',\''+b.fee+'\',\''+b.total+'\',\''+b.date+'\')">طباعة</button></div>'}).join('');}
-let dl=document.getElementById('debtsList');if(dl){let q=(document.getElementById('debtSearch').value||'').trim();dl.innerHTML='';Object.keys(DB.debts).forEach(function(k){if(q&&!k.includes(q))return;dl.innerHTML+='<div class="card"><b>'+k+'</b> - دين: '+DB.debts[k]+'</div>';});}
-let rb=document.getElementById('reportBox');if(rb){let totalIn=DB.wallets.reduce(function(a,w){return a+w.in},0);let totalOut=DB.wallets.reduce(function(a,w){return a+w.out},0);let totalDebt=Object.values(DB.debts).reduce(function(a,b){return a+b},0);let totalSales=DB.sales.reduce(function(a,s){return a+s.amt},0);rb.innerHTML='<div class="card"><p>اجمالي وارد الكاش: '+totalIn+'</p><p>اجمالي صادر الكاش: '+totalOut+'</p><p>اجمالي الديون: '+totalDebt+'</p><p>اجمالي مبيعات الكروت: '+totalSales+'</p><p>عدد الفواتير: '+DB.bills.length+'</p></div>';}
-}
-render();
-</script>
-</body>
-</html>
+<div class="muted">مبيعات النهاردة</div>
+<div class="big" id="todaySales">0 ج</div>
+<div class="row" style="margin-top:12px">
+<div><span class="muted">كاش</span><b id="cashToday">0</b></div>
+<div><span class="muted">آجل / ديون</span><b id="debtToday">0</b></div>
+<div><span class="muted">عدد الفواتير</span><b id="invCount">0</b></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:12px;position:sticky;top:0;z-index:10;background:#f1f5f9;padding:8px 0">
+<button id="tabBtn1" class="green" onclick="showTab(1)" style="flex:1;padding:14px;font-size:17px">شحن</button>
+<button id="tabBtn2" class="ghost" onclick="showTab(2)" style="flex:1;padding:14px;font-size:17px;border:2px solid #0f172a">بيع</button>
+<button id="tabBtn3" class="ghost" onclick="showTab(3)" style="flex:1;padding:14px;font-size:17px;border:2px solid #0f172a">كاش</button>
+<button id="tabBtn4" class="ghost" onclick="showTab(4)" style="flex:1;padding:14px;font-size:17px;border:2px solid #0f172a">تقارير</button>
+</div>
+<div id="tab1">
+<div class="card"><h3 style="margin:0">💳 المكنات</h3>
+<div style="display:flex;gap:8px;margin-top:10px">
+<div class="machine sel" id="m0" onclick="selectMachine(0)"><b>مكنة 1</b><div class="muted">الرصيد المتاح</div><b id="bal0">0 ج</b><div id="machWarn0" style="font-size:12px"></div><br><button class="small green" style="width:100%;margin-top:8px" onclick="event.stopPropagation();addBal(0)">زوّد رصيدك</button></div>
+<div class="machine" id="m1" onclick="selectMachine(1)"><b>مكنة 2</b><div class="muted">الرصيد المتاح</div><b id="bal1">0 ج</b><div id="machWarn1" style="font-size:12px"></div><br><button class="small green" style="width:100%;margin-top:8px" onclick="event.stopPropagation();addBal(1)">زوّد رصيدك</button></div>
+<div class="machine" id="m2" onclick="selectMachine(2)"><b>مكنة 3</b><div class="muted">الرصيد المتاح</div><b id="bal2">0 ج</b><div id="machWarn2" style="font-size:12px"></div><br><button class="small green" style="width:100%;margin-top:8px" onclick="event.stopPropagation();addBal(2)">زوّد رصيدك</button></div>
+</div></div>
+<div class="card"><h3 style="margin:0">⚡ شحن الرصيد</h3>
+<input id="rechAmount" type="number" placeholder="المبلغ - مثال: 100" oninput="calcRecharge()">
+<div class="flex"><input id="rechDeduct" type="number" placeholder="..."><input id="rechSell" type="number" placeholder="..."></div>
+<input id="rechCust" placeholder="الزبون">
+<button id="rechAjelBtn" class="ghost" onclick="toggleAjel('recharge')">آجل</button>
+<button class="green" onclick="doRecharge()">شحن</button></div>
+<div class="card"><h3 style="margin:0">🎫 الكروت</h3>
+<div id="cardCatRow" style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 2px"></div>
+<div class="flex"><input id="cardCatDeduct" type="number" placeholder="..."><input id="cardCatSell" type="number" placeholder="..."></div>
+<input id="cardCatCust" placeholder="الزبون">
+<button id="cardAjelBtn" class="ghost" onclick="toggleAjel('card')">آجل</button>
+<button class="green" onclick="sellCardCat()">بيع</button></div>
+<div class="card"><h3 style="margin:0">📶 كروت الجيجات</h3>
+<div id="gigaRow" style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 2px"></div>
+<div class="flex"><input id="gigaDeduct" type="number" placeholder="..."><input id="gigaSell" type="number" placeholder="..."></div>
+<input id="gigaCust" placeholder="الزبون">
+<button id="gigaAjelBtn" class="ghost" onclick="toggleAjel('giga')">آجل</button>
+<button class="green" onclick="sellGiga()">بيع</button></div>
