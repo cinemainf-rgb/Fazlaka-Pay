@@ -5,19 +5,88 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fazlaka Pay</title>
 <style>
-body{font-family:sans-serif;text-align:center;padding:30px;background:#fff;color:#111}
-h1{font-size:32px}
-button{padding:15px 20px;margin:10px;font-size:18px;border-radius:12px;border:1px solid #111;background:#111;color:#fff;width:90%}
+*{box-sizing:border-box}body{font-family:sans-serif;margin:0;background:#fff;color:#111;padding-bottom:90px}
+header{text-align:center;padding:18px 10px 8px}header h1{margin:0;font-size:32px}header p{margin:6px 0;color:#555}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#111;padding:8px;gap:6px;z-index:10}
+nav button{flex:1;background:#fff;color:#111;border:0;padding:12px 4px;border-radius:10px;font-size:13px;font-weight:bold}
+.tab{display:none;padding:12px}.tab.active{display:block}
+.card{border:1px solid #111;border-radius:14px;padding:12px;margin:10px 0}
+input,select{width:100%;padding:12px;margin:6px 0;border:1px solid #111;border-radius:10px;font-size:16px}
+button{padding:13px;margin:6px 0;border:0;border-radius:12px;font-size:16px;font-weight:bold}
+.btn-black{background:#111;color:#fff;width:100%}.btn-white{background:#fff;color:#111;border:1px solid #111;width:100%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.small{font-size:13px;color:#555}.log{font-size:14px;border-top:1px dashed #999;padding:6px 0}
+#printArea{width:58mm;margin:0 auto;text-align:center;font-family:monospace;color:#000;background:#fff;padding:8px}
 </style>
 </head>
 <body>
-<h1>Fazlaka Pay</h1>
-<p>فزلكا - كل يوم معاك</p>
-<button onclick="alert('الكاش')">الكاش</button>
-<button onclick="alert('بيع')">بيع</button>
-<button onclick="alert('فواتير')">فواتير</button>
-<button onclick="alert('ديون')">ديون</button>
-<button onclick="alert('تقارير')">تقارير</button>
-<p>ده ملف index.html المؤقت عشان البناء يشتغل، وبعد ما الـ APK يطلع هنبدله بملف البرنامج الكامل بتاعك.</p>
+<header><h1>Fazlaka Pay</h1><p>فزلكا - كل يوم معاك</p></header>
+<div id="lockScreen" class="tab active" style="text-align:center;padding:30px">
+<h2>قفل البرنامج</h2><p class="small">ادخل الرقم السري - اول مرة : 1234</p>
+<input id="passInput" type="password" placeholder="الرقم السري" inputmode="numeric">
+<button class="btn-black" onclick="unlock()">دخول</button><p class="small" id="lockMsg"></p></div>
+<div id="cash" class="tab"><h2>الكاش - المحافظ</h2>
+<div class="card"><h3>إضافة محفظة جديدة</h3>
+<input id="newWalletName" placeholder="اسم المحفظة">
+<select id="newWalletType"><option value="200000">محفظة عادية - حد 200000</option><option value="400000">انستا باي - حد 400000</option><option value="200000">فوري - حد 200000</option><option value="999999999">كاش اوت - بدون حد</option></select>
+<button class="btn-black" onclick="addWallet()">إضافة محفظة</button></div>
+<div id="wallets"></div>
+<div class="card"><h3>حركة كاش</h3><select id="cashWallet"></select>
+<input id="cashAmount" type="number" placeholder="المبلغ">
+<input id="cashPerson" placeholder="من / إلى - اسم الشخص">
+<label><input type="checkbox" id="cashAjal"> آجل - يتسجل دين على العميل</label>
+<div style="display:flex;gap:8px"><button class="btn-black" onclick="cashIn()">دخول - وارد</button><button class="btn-white" onclick="cashOut()">خروج - صادر</button></div></div>
+<div id="cashLogs"></div></div>
+<div id="sell" class="tab"><h2>بيع - كروت</h2><p class="small">اضغط على الفئة، تتسجل آجل على العميل تلقائيا</p>
+<input id="sellCustomer" placeholder="اسم العميل">
+<div class="grid"><button class="btn-black" onclick="sellCard(20)">20</button><button class="btn-black" onclick="sellCard(50)">50</button><button class="btn-black" onclick="sellCard(100)">100</button><button class="btn-black" onclick="sellCard(150)">150</button><button class="btn-black" onclick="sellCard(200)">200</button></div>
+<div id="sellLog"></div></div>
+<div id="bills" class="tab"><h2>دفع فواتير</h2>
+<div class="card"><select id="billService"><option>كهرباء</option><option>مياه</option><option>غاز</option><option>نت</option><option>شحن</option><option>ارضي</option><option>خدمة اخرى</option></select>
+<input id="billCustomerNo" placeholder="رقم العميل">
+<input id="billAmount" type="number" placeholder="المبلغ المستحق">
+<input id="billFee" type="number" placeholder="رسوم الخدمة">
+<input id="billTotal" type="number" placeholder="الاجمالي">
+<input id="billDate" type="datetime-local">
+<button class="btn-black" onclick="saveBill()">حفظ وطباعة الوصل</button></div><div id="billsLog"></div></div>
+<div id="debts" class="tab"><h2>الديون - الآجل</h2>
+<input id="debtSearch" placeholder="ابحث باسم العميل" oninput="render()">
+<div id="debtsList"></div>
+<div class="card"><h3>سداد دين</h3><input id="payDebtName" placeholder="اسم العميل"><input id="payDebtAmount" type="number" placeholder="المبلغ المسدد"><button class="btn-black" onclick="payDebt()">سداد</button></div></div>
+<div id="reports" class="tab"><h2>تقارير</h2><div id="reportBox"></div>
+<div style="display:flex;gap:8px"><button class="btn-black" onclick="exportBackup()">نسخ احتياطي</button><button class="btn-white" onclick="document.getElementById('importFile').click()">استيراد</button></div>
+<input type="file" id="importFile" hidden onchange="importBackup(event)">
+<button class="btn-white" onclick="shareWhatsApp()">مشاركة على واتساب</button>
+<button class="btn-white" onclick="clearAll()">مسح كل البيانات</button></div>
+<div id="printArea" style="display:none"></div>
+<nav><button onclick="showTab('cash')" id="btn-cash">الكاش</button><button onclick="showTab('sell')" id="btn-sell">بيع</button><button onclick="showTab('bills')" id="btn-bills">فواتير</button><button onclick="showTab('debts')" id="btn-debts">ديون</button><button onclick="showTab('reports')" id="btn-reports">تقارير</button></nav>
+<script>
+let DB = JSON.parse(localStorage.getItem('fazlaka_db')||'{"wallets":[],"tx":[],"debts":{},"bills":[],"sales":[]}');
+let PASS = localStorage.getItem('fazlaka_pass')||'1234';
+function save(){localStorage.setItem('fazlaka_db',JSON.stringify(DB));render();}
+function unlock(){if(document.getElementById('passInput').value===PASS){document.getElementById('lockScreen').classList.remove('active');showTab('cash');}else{document.getElementById('lockMsg').innerText='الرقم غلط';}}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');render();}
+function addWallet(){let n=document.getElementById('newWalletName').value.trim();if(!n)return alert('اكتب اسم المحفظة');let limit=parseInt(document.getElementById('newWalletType').value);DB.wallets.push({name:n,limit:limit,in:0,out:0});document.getElementById('newWalletName').value='';save();}
+function cashIn(){doCash('in')} function cashOut(){doCash('out')}
+function doCash(type){let wi=document.getElementById('cashWallet').value;let amt=parseFloat(document.getElementById('cashAmount').value);let person=document.getElementById('cashPerson').value.trim()||'عميل';let ajal=document.getElementById('cashAjal').checked;if(!amt)return alert('اكتب المبلغ');let w=DB.wallets[wi];if(!w)return alert('اضف محفظة الاول');if(type==='in')w.in+=amt;else w.out+=amt;DB.tx.push({wallet:w.name,amt:amt,type:type,person:person,ajal:ajal,date:new Date().toLocaleString('ar-EG')});if(ajal){DB.debts[person]=(DB.debts[person]||0)+amt;}document.getElementById('cashAmount').value='';save();alert('تم');}
+function deleteLast(walletName){for(let i=DB.tx.length-1;i>=0;i--){if(DB.tx[i].wallet===walletName){let t=DB.tx[i];let w=DB.wallets.find(x=>x.name===walletName);if(t.type==='in')w.in-=t.amt;else w.out-=t.amt;if(t.ajal)DB.debts[t.person]=(DB.debts[t.person]||0)-t.amt;DB.tx.splice(i,1);break;}}save();}
+function sellCard(amt){let cust=document.getElementById('sellCustomer').value.trim()||'عميل';DB.sales.push({amt:amt,customer:cust,date:new Date().toLocaleString('ar-EG')});DB.debts[cust]=(DB.debts[cust]||0)+amt;save();alert('تم بيع كارت '+amt+' آجل على '+cust);}
+function saveBill(){let s=document.getElementById('billService').value;let no=document.getElementById('billCustomerNo').value;let amt=document.getElementById('billAmount').value;let fee=document.getElementById('billFee').value;let total=document.getElementById('billTotal').value;let date=document.getElementById('billDate').value||new Date().toLocaleString('ar-EG');DB.bills.push({service:s,no:no,amt:amt,fee:fee,total:total,date:date});save();printReceipt(s,no,amt,fee,total,date);}
+function printReceipt(s,no,amt,fee,total,date){let el=document.getElementById('printArea');el.style.display='block';el.innerHTML='<h2>Fazlaka</h2><p>فزلكا - كل يوم معاك</p><hr><p>الخدمة: '+s+'</p><p>رقم العميل: '+no+'</p><p>المبلغ المستحق: '+amt+'</p><p>رسوم الخدمة: '+fee+'</p><p><b>الاجمالي: '+total+'</b></p><p>التاريخ: '+date+'</p><hr><p>Fazlaka - كل يوم معاك</p>';window.print();setTimeout(()=>{el.style.display='none';},800);}
+function payDebt(){let n=document.getElementById('payDebtName').value.trim();let a=parseFloat(document.getElementById('payDebtAmount').value);if(!n||!a)return alert('اكتب الاسم والمبلغ');DB.debts[n]=Math.max(0,(DB.debts[n]||0)-a);save();alert('تم السداد');}
+function exportBackup(){let blob=new Blob([JSON.stringify(DB)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fazlaka-backup.json';a.click();}
+function importBackup(e){let r=new FileReader();r.onload=()=>{DB=JSON.parse(r.result);save();alert('تم الاستيراد')};r.readAsText(e.target.files[0]);}
+function shareWhatsApp(){let total=Object.values(DB.debts).reduce((a,b)=>a+b,0);window.open('https://wa.me/?text='+encodeURIComponent('Fazlaka Pay - اجمالي الديون: '+total));}
+function clearAll(){if(confirm('مسح كل البيانات؟')){localStorage.removeItem('fazlaka_db');location.reload();}}
+function render(){
+let wDiv=document.getElementById('wallets');let sel=document.getElementById('cashWallet');
+if(wDiv){wDiv.innerHTML='';sel.innerHTML='';DB.wallets.forEach((w,i)=>{sel.innerHTML+='<option value="'+i+'">'+w.name+'</option>';let rem=w.limit-(w.out-w.in);wDiv.innerHTML+='<div class="card"><h3>'+w.name+'</h3><p>وارد: '+w.in+' | صادر: '+w.out+' | المتبقي: '+rem+'</p><button class="btn-white" onclick="deleteLast(\''+w.name+'\')">حذف اخر حركة</button></div>';});}
+let logs=document.getElementById('cashLogs');if(logs){logs.innerHTML='<h3>سجل الحركات</h3>'+DB.tx.slice().reverse().map(t=>'<div class="log">'+t.date+' - '+t.wallet+' - '+(t.type==='in'?'دخول':'خروج')+' - '+t.amt+' - '+t.person+(t.ajal?' - آجل':'')+'</div>').join('');}
+let sl=document.getElementById('sellLog');if(sl){sl.innerHTML='<h3>سجل البيع</h3>'+DB.sales.slice().reverse().map(s=>'<div class="log">'+s.date+' - كارت '+s.amt+' - '+s.customer+' - آجل</div>').join('');}
+let bl=document.getElementById('billsLog');if(bl){bl.innerHTML='<h3>سجل الفواتير</h3>'+DB.bills.slice().reverse().map(b=>'<div class="log">'+b.service+' - '+b.no+' - اجمالي '+b.total+' - '+b.date+'</div>').join('');}
+let dl=document.getElementById('debtsList');if(dl){let q=(document.getElementById('debtSearch').value||'').trim();dl.innerHTML='';Object.keys(DB.debts).forEach(k=>{if(q&&!k.includes(q))return;dl.innerHTML+='<div class="card"><b>'+k+'</b> - دين: '+DB.debts[k]+'</div>';});}
+let rb=document.getElementById('reportBox');if(rb){let totalIn=DB.wallets.reduce((a,w)=>a+w.in,0);let totalOut=DB.wallets.reduce((a,w)=>a+w.out,0);let totalDebt=Object.values(DB.debts).reduce((a,b)=>a+b,0);let totalSales=DB.sales.reduce((a,s)=>a+s.amt,0);rb.innerHTML='<div class="card"><p>اجمالي وارد الكاش: '+totalIn+'</p><p>اجمالي صادر الكاش: '+totalOut+'</p><p>اجمالي الديون: '+totalDebt+'</p><p>اجمالي مبيعات الكروت: '+totalSales+'</p><p>عدد الفواتير: '+DB.bills.length+'</p></div>';}
+}
+render();
+</script>
 </body>
 </html>
