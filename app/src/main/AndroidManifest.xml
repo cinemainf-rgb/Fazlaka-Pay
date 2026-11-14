@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:【entity-android¦canonical_name=Android】="http://schemas.android.com/apk/res/android">
-    <uses-permission 【entity-android¦canonical_name=Android】:name="【entity-android¦canonical_name=Android】.permission.USE_BIOMETRIC" />
-    <uses-permission 【entity-android¦canonical_name=Android】:name="【entity-android¦canonical_name=Android】.permission.INTERNET" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <application
-        【entity-android¦canonical_name=Android】:allowBackup="true"
-        【entity-android¦canonical_name=Android】:label="Fazlaka Pay"
-        【entity-android¦canonical_name=Android】:icon="@mipmap/ic_launcher"
-        【entity-android¦canonical_name=Android】:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        【entity-android¦canonical_name=Android】:usesCleartextTraffic="true">
+        android:allowBackup="true"
+        android:label="Fazlaka Pay"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:usesCleartextTraffic="true">
         <activity
-            【entity-android¦canonical_name=Android】:name=".MainActivity"
-            【entity-android¦canonical_name=Android】:exported="true"
-            【entity-android¦canonical_name=Android】:configChanges="orientation|screenSize">
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
-                <action 【entity-android¦canonical_name=Android】:name="【entity-android¦canonical_name=Android】.intent.action.MAIN" />
-                <category 【entity-android¦canonical_name=Android】:name="【entity-android¦canonical_name=Android】.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
