@@ -19,7 +19,7 @@
 :where(code, pre, kbd, samp) {
   font-family: "Optimistic Mono", ui-monospace, monospace;
 }
-</style><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="logo.png" type="image/png"><title>Fazlaka Pay</title><style>
+</style><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fazlaka Pay</title><style>
 *{box-sizing:border-box}body{margin:0;background:#eef2f7;font-family:system-ui;padding:10px;padding-bottom:80px}body.dark{background:#0f172a;color:#fff}body.dark .card{background:#1e293b;color:#fff}body.dark .box{background:#334155;color:#fff}
 input,select,button{width:100%;padding:11px;border-radius:10px;border:1px solid #cbd5e1;font-size:15px;margin:4px 0}button{border:none;font-weight:800;cursor:pointer}.green{background:#16a34a;color:#fff}.gray{background:#e2e8f0}.red{background:#ef4444;color:#fff}.orange{background:#f59e0b;color:#fff}
 .card{background:#fff;border-radius:16px;padding:14px;margin:10px 0}.muted{color:#64748b;font-size:12px}.big{text-align:center;font-size:26px;font-weight:900}.row{display:flex;gap:8px}.box{flex:1;background:#f8fafc;border-radius:12px;padding:10px;text-align:center}.box b{display:block}
@@ -30,7 +30,7 @@ input,select,button{width:100%;padding:11px;border-radius:10px;border:1px solid 
 .small{padding:6px 10px;width:auto;font-size:13px}
 .machine{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8fafc;border-radius:12px;margin:6px 0}
 </style></head><body>
-<div class="top"><div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:8px"><img src="logo.png" onerror="this.style.display='none'" style="height:32px;width:auto;object-fit:contain"><b>Fazlaka Pay</b></div><div style="display:flex;gap:6px"><button onclick="toggleNight()" style="width:auto;background:none;font-size:20px">🌙</button><button onclick="toggleEye()" id="eyeBtn" style="width:auto;background:none;font-size:20px">👁️</button></div></div>
+<div class="top"><div style="display:flex;justify-content:space-between;align-items:center"><b>🏪 Fazlaka Pay</b><div style="display:flex;gap:6px"><button onclick="toggleNight()" style="width:auto;background:none;font-size:20px">🌙</button><button onclick="toggleEye()" id="eyeBtn" style="width:auto;background:none;font-size:20px">👁️</button></div></div>
 <div class="main"><div class="mcard"><div class="muted" style="color:#94a3b8">💵 النقدية</div><b data-money style="color:#4ade80" id="hCashBal">0</b></div><div class="mcard"><div class="muted" style="color:#94a3b8">💰 ربح اليوم</div><b data-money style="color:#facc15" id="hProfit">0</b></div><div class="mcard"><div class="muted" style="color:#94a3b8">📊 بعنا</div><b data-money id="hSell">0</b></div></div><div id="alertFawry" class="hide" style="background:#fef3c7;color:#92400e;border-radius:10px;padding:8px;text-align:center;margin-top:8px;font-weight:800">⚠️ فوري قربت تخلص</div></div>
 
 <div id="setup" class="card hide"><b>أول مرة</b><input id="sM1" type="number" placeholder="مكنة 1"><input id="sM2" type="number" placeholder="مكنة 2"><input id="sM3" type="number" placeholder="مكنة 3"><input id="sInsta" type="number" placeholder="انستا"><input id="sFawry" type="number" placeholder="فوري"><input id="sCash" type="number" placeholder="نقدية"><button class="green" onclick="saveSetup()">حفظ</button></div>
@@ -52,37 +52,16 @@ input,select,button{width:100%;padding:11px;border-radius:10px;border:1px solid 
 
 <div id="tab4" class="hide"><div class="card"><b>📊 حساب اليوم</b><div class="row"><div class="box"><span class="muted">جملة</span><b data-money id="todayCost">0</b></div><div class="box"><span class="muted">بعد المكسب</span><b data-money id="todaySell">0</b></div><div class="box"><span class="muted">ربح</span><b data-money id="todayProfit">0</b></div></div><div class="row"><div class="box"><span class="muted">كاش</span><b id="cashToday">0</b></div><div class="box"><span class="muted">آجل</span><b id="debtToday">0</b></div><div class="box"><span class="muted">مصاريف</span><b id="feesToday">0</b></div></div></div>
 <div class="card"><b>💰 الأرباح</b><div class="big" data-money id="profitTotal">0</div><div class="row"><div class="box"><span class="muted">ربح الكاش</span><b data-money id="profitCash">0</b></div><div class="box"><span class="muted">ربح الآجل</span><b data-money id="profitDebt">0</b></div></div><div class="muted" id="profitBreak"></div></div>
-<div class="card"><b>👆 البصمة</b><div class="muted">فعّل البصمة عشان تدخل بيها بدل الرقم السري</div><button class="green" onclick="enableFingerprint()">تفعيل البصمة</button><button class="gray" onclick="disableFingerprint()">إلغاء البصمة</button><div id="fpStatus" class="muted"></div></div><div class="card"><b>🔒 الرقم السري</b><input id="oldPin" type="password" placeholder="القديم"><input id="newPin" type="password" placeholder="الجديد"><button class="green" onclick="changePin()">تغيير</button></div>
+<div class="card"><b>🔒 الرقم السري</b><input id="oldPin" type="password" placeholder="القديم"><input id="newPin" type="password" placeholder="الجديد"><button class="green" onclick="changePin()">تغيير</button></div>
 <div class="card"><b>🧾 تقفيل اليوم</b><input id="drawer" type="number" placeholder="الكاش في الدرج كام؟"><button class="green" onclick="closeDay()">قفل اليوم</button><div id="closeRes"></div><button class="green" onclick="whatsapp()">📋 واتساب</button><button class="gray" onclick="backup()">💾 نسخة احتياطية</button></div>
 <div class="card"><b>📋 آخر العمليات</b><div id="logs"></div><button class="red" onclick="delLast()">حذف آخر</button></div></div>
 
 <div class="tabs"><button onclick="showTab(1)" id="t1" class="on">شحن</button><button onclick="showTab(2)" id="t2">بيع</button><button onclick="showTab(3)" id="t3">كاش</button><button onclick="showTab(4)" id="t4">تقارير</button></div>
-<div id="lock" style="position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:99"><img src="logo.png" onerror="this.style.display='none'" style="height:54px;width:auto;object-fit:contain"><h2 style="margin:0">Fazlaka Pay</h2><input id="pinIn" type="password" placeholder="الرقم السري" style="max-width:280px"><button class="green" style="max-width:280px" onclick="unlock()">دخول</button><button style="max-width:280px;background:#5EEAD4;color:#0E3A3E" onclick="tryFingerprint()">👆 دخول بالبصمة</button><div id="fpMsg" class="muted" style="color:#94a3b8"></div><button style="max-width:280px;background:none;color:#94a3b8;font-size:13px" onclick="resetPin()">نسيت الرقم؟ اضغط هنا</button></div>
+<div id="lock" style="position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:99"><h2>Fazlaka Pay</h2><input id="pinIn" type="password" placeholder="الرقم السري" style="max-width:280px"><button class="green" style="max-width:280px" onclick="unlock()">دخول</button></div>
 <script>
-var D=JSON.parse(localStorage.getItem('fz2')||'null')||{pin:'4440',fingerprintEnabled:false,machines:[0,0,0],cash:0,wallets:{'انستا باي':0,'فوري':0,'كاش اوت':0,'محفظة 1':0,'محفظة 2':0,'محفظة 3':0,'محفظة 4':0,'محفظة 5':0,'محفظة 6':0,'محفظة 7':0,'محفظة 8':0},limits:{'انستا باي':400000,'فوري':200000},sales:[],debts:[],logs:[],lastBill:null,inv:1,setupDone:false};
+var D=JSON.parse(localStorage.getItem('fz2')||'null')||{pin:'4440',machines:[0,0,0],cash:0,wallets:{'انستا باي':0,'فوري':0,'كاش اوت':0,'محفظة 1':0,'محفظة 2':0,'محفظة 3':0,'محفظة 4':0,'محفظة 5':0,'محفظة 6':0,'محفظة 7':0,'محفظة 8':0},limits:{'انستا باي':400000,'فوري':200000},sales:[],debts:[],logs:[],lastBill:null,inv:1,setupDone:false};
 if(!D.setupDone)document.getElementById('setup').classList.remove('hide');
-function save(){localStorage.setItem('fz2',JSON.stringify(D));
-async function tryFingerprint(){
-  if(!D.fingerprintEnabled) return document.getElementById('fpMsg').textContent='البصمة مش مفعلة - فعلها من التقارير بعد ما تدخل بالرقم السري';
-  if(!window.PublicKeyCredential) return document.getElementById('fpMsg').textContent='البصمة الحقيقية مش مدعومة هنا - ادخل بالرقم السري';
-  try{
-    await navigator.credentials.get({publicKey:{challenge:new Uint8Array(32),allowCredentials:[],userVerification:'required',timeout:30000}});
-    document.getElementById('lock').style.display='none'; lastAct=Date.now();
-  }catch(e){
-    document.getElementById('fpMsg').textContent='البصمة ماتطابقتش - جرب تاني أو ادخل بالرقم السري';
-  }
-}
-async function enableFingerprint(){
-  if(!window.PublicKeyCredential) return document.getElementById('fpStatus').textContent='البصمة الحقيقية مش مدعومة هنا';
-  try{
-    await navigator.credentials.create({publicKey:{challenge:new Uint8Array(32),rp:{name:'Fazlaka Pay'},user:{id:new Uint8Array([1]),name:'user',displayName:'Fazlaka'},pubKeyCredParams:[{alg:-7,type:'public-key'}],authenticatorSelection:{userVerification:'required'},timeout:30000}});
-    D.fingerprintEnabled=true; save(); document.getElementById('fpStatus').textContent='البصمة اتفعلت ✅ - بصمة حقيقية';
-  }catch(e){ document.getElementById('fpStatus').textContent='البصمة ماتسجلتش - جرب تاني'; }
-}
-function disableFingerprint(){ D.fingerprintEnabled=false; save(); document.getElementById('fpStatus').textContent='البصمة اتلغت'; }
-function resetPin(){ if(confirm('هترجع الرقم السري للافتراضي؟')){ D.pin='4440'; save(); alert('اترجع - جرب تدخل دلوقتي'); } }
-
-render();}
+function save(){localStorage.setItem('fz2',JSON.stringify(D));render();}
 function saveSetup(){D.machines=[+document.getElementById('sM1').value||0,+document.getElementById('sM2').value||0,+document.getElementById('sM3').value||0];D.wallets['انستا باي']=+document.getElementById('sInsta').value||0;D.wallets['فوري']=+document.getElementById('sFawry').value||0;D.cash=+document.getElementById('sCash').value||0;D.setupDone=true;document.getElementById('setup').classList.add('hide');save();}
 function showTab(n){[1,2,3,4].forEach(i=>{document.getElementById('tab'+i).classList.toggle('hide',i!==n);document.getElementById('t'+i).classList.toggle('on',i===n);});}
 var eye=false;function toggleEye(){eye=!eye;document.getElementById('eyeBtn').textContent=eye?'🙈':'👁️';document.querySelectorAll('[data-money]').forEach(e=>{if(eye){e.dataset.v=e.textContent;e.textContent='****';}else e.textContent=e.dataset.v||e.textContent;});}
@@ -117,26 +96,5 @@ document.getElementById('alertFawry').classList.toggle('hide',!(D.wallets['فو�
 }
 function editWallet(k){var v=prompt('رصيد جديد لـ '+k, D.wallets[k]);if(v!==null){D.wallets[k]=+v;save();}}
 function delWalletTx(k){D.sales=D.sales.filter(x=>!x.type.includes(k));save();}
-
-async function tryFingerprint(){
-  if(!D.fingerprintEnabled) return document.getElementById('fpMsg').textContent='البصمة مش مفعلة - فعلها من التقارير بعد ما تدخل بالرقم السري';
-  if(!window.PublicKeyCredential) return document.getElementById('fpMsg').textContent='البصمة الحقيقية مش مدعومة هنا - ادخل بالرقم السري';
-  try{
-    await navigator.credentials.get({publicKey:{challenge:new Uint8Array(32),allowCredentials:[],userVerification:'required',timeout:30000}});
-    document.getElementById('lock').style.display='none'; lastAct=Date.now();
-  }catch(e){
-    document.getElementById('fpMsg').textContent='البصمة ماتطابقتش - جرب تاني أو ادخل بالرقم السري';
-  }
-}
-async function enableFingerprint(){
-  if(!window.PublicKeyCredential) return document.getElementById('fpStatus').textContent='البصمة الحقيقية مش مدعومة هنا';
-  try{
-    await navigator.credentials.create({publicKey:{challenge:new Uint8Array(32),rp:{name:'Fazlaka Pay'},user:{id:new Uint8Array([1]),name:'user',displayName:'Fazlaka'},pubKeyCredParams:[{alg:-7,type:'public-key'}],authenticatorSelection:{userVerification:'required'},timeout:30000}});
-    D.fingerprintEnabled=true; save(); document.getElementById('fpStatus').textContent='البصمة اتفعلت ✅ - بصمة حقيقية';
-  }catch(e){ document.getElementById('fpStatus').textContent='البصمة ماتسجلتش - جرب تاني'; }
-}
-function disableFingerprint(){ D.fingerprintEnabled=false; save(); document.getElementById('fpStatus').textContent='البصمة اتلغت'; }
-function resetPin(){ if(confirm('هترجع الرقم السري للافتراضي؟')){ D.pin='4440'; save(); alert('اترجع - جرب تدخل دلوقتي'); } }
-
 render();
 </script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
