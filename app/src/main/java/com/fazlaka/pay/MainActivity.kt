@@ -1,4 +1,4 @@
-package com.example.fazlakapay
+package com.fazlaka.pay
 
 import android.os.Bundle
 import android.webkit.WebView
