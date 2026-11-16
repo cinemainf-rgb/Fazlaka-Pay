@@ -58,7 +58,7 @@ button.gold{background:linear-gradient(135deg,#b8860b,var(--gold))}
 .machine.active .bar i{background:#fff}
 .opt{padding:10px;background:var(--brand-light);border-radius:12px;text-align:center;cursor:pointer;font-size:14px;font-weight:600}
 .opt.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);display:grid;grid-template-columns:repeat(5,1fr);padding:8px;gap:6px;border-top:1px solid var(--line);z-index:20}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);display:grid;grid-template-columns:repeat(4,1fr);padding:8px;gap:6px;border-top:1px solid var(--line);z-index:20}
 nav button{background:transparent;color:var(--muted);font-size:11px;padding:8px 4px;box-shadow:none;border-radius:10px;font-weight:600}
 nav button.active{background:var(--brand-light);color:var(--brand)}
 [data-theme="dark"] nav button.active{color:var(--brand2)}
@@ -219,6 +219,11 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
     <h3>آخر المعاملات</h3>
     <div id="walletTxList"></div>
   </div>
+  <div class="card">
+    <h3>➕ إضافة محفظة جديدة</h3>
+    <input id="newWalletName" placeholder="اسم المحفظة الجديدة">
+    <button class="grey" onclick="addWallet()">إضافة</button>
+  </div>
 </section>
 
 <section id="page-reports" style="display:none">
@@ -271,14 +276,13 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
   <button id="nav-sales" onclick="show('sales')">🛒<br>مبيعات</button>
   <button id="nav-wallets" onclick="show('wallets')">💳<br>المحافظ</button>
   <button id="nav-reports" onclick="show('reports')">📊<br>التقارير</button>
-  <button onclick="shareWhatsApp()">📱<br>واتساب</button>
 </nav>
 
 <div id="toast"></div>
 <div class="modal" id="genericModal"><div class="box" id="modalBody"></div></div>
 
 <script>
-const STORE_KEY='fazlaka_v3';
+const STORE_KEY='fazlaka_v4';
 const DEFAULT={
   machines:{fawry_main:0,fawry_cards:0,fawry_cashout:0,basata:0,mobile:0,cash_egypt:0},
   machineNames:{fawry_main:'فوري رئيسي',fawry_cards:'فوري كروت',fawry_cashout:'فوري كاش أوت',basata:'بساطة',mobile:'موبايل',cash_egypt:'كاش مصر'},
@@ -364,36 +368,78 @@ function doBill(){
 }
 function doTopup(){
   requirePin(()=>{
+    if(S.closed)return toast('اليوم مقفل — لا يمكن التغذية');
     const m=$('topMachine').value,from=$('topFrom').value,a=num($('topAmt').value);
     if(!a)return toast('اكتب مبلغ التغذية');
     const left=walletLeft(from);if(left!=null&&left<a)return toast('وصلت لليميت');
+    if(walletBal(from) < a) return toast('الرصيد غير كافي في ' + walletName(from)); // منع السالب
     S.wallets[from].out+=a;S.machines[m]+=a;
     addOp('تغذية',0,a,0,'تغذية '+machineName(m)+' من '+walletName(from));save();
     $('topAmt').value='';$('topMsg').innerHTML=`<span class="ok">تم تغذية ${machineName(m)} بـ ${fmt(a)}</span>`;toast('تمت التغذية');
   });
 }
 function addProduct(){const n=$('pName').value.trim(),q=num($('pQty').value),b=num($('pBuy').value),s=num($('pSell').value);if(!n||!q)return toast('اكتب اسم وكمية');S.products.push({n,q,b,s});$('pName').value='';$('pQty').value='';$('pBuy').value='';$('pSell').value='';save();toast('تمت الإضافة')}
-function sellProduct(i){const p=S.products[i];if(p.q<=0)return toast('الكمية صفر');p.q--;S.wallets.cash.in+=p.s;addOp('منتج',p.b,p.s,p.s-p.b,p.n);save();toast('تم بيع '+p.n)}
+function sellProduct(i){
+  if(S.closed) return toast('اليوم مقفل');
+  const p=S.products[i];if(p.q<=0)return toast('الكمية صفر');
+  p.q--;S.wallets.cash.in+=p.s;addOp('منتج',p.b,p.s,p.s-p.b,p.n);save();toast('تم بيع '+p.n)
+}
 function addWalletTx(){
   const k=$('wSelect').value,type=$('wType').value,a=num($('wAmt').value),reason=$('wReason').value.trim(),person=$('wPerson').value.trim();
+  if(S.closed) return toast('اليوم مقفل — لا يمكن إضافة معاملات'); // منع التعديل بعد التقفيل
   if(!a||!reason)return toast('اكتب المبلغ والسبب');
-  if(type==='out'){const left=walletLeft(k);if(left!=null&&left<a)return toast('وصلت لليميت');S.wallets[k].out+=a}else S.wallets[k].in+=a;
+  if(type==='out'){
+    const left=walletLeft(k);
+    if(left!=null&&left<a) return toast('وصلت لليميت');
+    if(walletBal(k) < a) return toast('الرصيد غير كافي في ' + walletName(k)); // منع السالب
+    S.wallets[k].out+=a;
+  } else S.wallets[k].in+=a;
   S.ops.push({type:type==='in'?'داخل '+walletName(k):'خارج '+walletName(k),deduct:0,sell:a,profit:0,detail:reason+(person?' | '+person:''),time:new Date().toLocaleString('ar-EG'),ts:Date.now()});
   save();$('wAmt').value='';$('wReason').value='';$('wPerson').value='';
   $('wMsg').innerHTML=`<span class="ok">تم الحفظ — الرصيد ${fmt(walletBal(k))}</span>`;toast('تم الحفظ');
 }
-function addExpense(){const a=num($('exAmt').value),r=$('exReason').value.trim();if(!a||!r)return toast('اكتب المبلغ والسبب');S.expenses.push({a,r,time:new Date().toLocaleString('ar-EG'),ts:Date.now()});S.wallets.cash.out+=a;S.ops.push({type:'مصروف',deduct:0,sell:a,profit:-a,detail:r,time:new Date().toLocaleString('ar-EG'),ts:Date.now()});$('exAmt').value='';$('exReason').value='';save();toast('تم حفظ المصروف')}
+function addWallet(){
+  requirePin(()=>{
+    const n = $('newWalletName').value.trim();
+    if(!n) return toast('اكتب اسم المحفظة');
+    const key = 'w_' + Date.now();
+    S.wallets[key] = {in:0, out:0, limit:200000};
+    S.walletNames[key] = n;
+    $('newWalletName').value = '';
+    save();
+    toast('تمت إضافة المحفظة');
+  });
+}
+function addExpense(){
+  if(S.closed) return toast('اليوم مقفل'); // منع التعديل بعد التقفيل
+  const a=num($('exAmt').value),r=$('exReason').value.trim();
+  if(!a||!r)return toast('اكتب المبلغ والسبب');
+  if(walletBal('cash') < a) return toast('الكاش غير كافي'); // منع السالب
+  S.expenses.push({a,r,time:new Date().toLocaleString('ar-EG'),ts:Date.now()});
+  S.wallets.cash.out+=a;
+  S.ops.push({type:'مصروف',deduct:0,sell:a,profit:-a,detail:r,time:new Date().toLocaleString('ar-EG'),ts:Date.now()});
+  $('exAmt').value='';$('exReason').value='';save();toast('تم حفظ المصروف');
+}
 function addDebt(){const n=$('dName').value.trim(),a=num($('dAmt').value);if(!n||!a)return toast('اكتب الاسم والمبلغ');S.debts.push({name:n,amount:a,ts:Date.now()});$('dName').value='';$('dAmt').value='';save();toast('تم حفظ الدين')}
 function payDebt(i,a){const amt=num(prompt('مبلغ السداد',a));if(!amt)return;S.debts[i].amount-=amt;if(S.debts[i].amount<=0)S.debts.splice(i,1);S.wallets.cash.in+=amt;S.ops.push({type:'سداد دين',deduct:0,sell:amt,profit:0,detail:'سداد دين',time:new Date().toLocaleString('ar-EG'),ts:Date.now()});save();toast('تم السداد')}
-function doClose(){
+  function doClose(){
   requirePin(()=>{
+    if(S.closed) return toast('اليوم مقفل بالفعل'); // منع التكرار
     const actual=num($('actualCash').value),cash=cashBal(),diff=actual-cash;
     S.archive.push({date:todayStr(),ops:structuredClone(S.ops),expenses:structuredClone(S.expenses),debts:structuredClone(S.debts),machines:structuredClone(S.machines),wallets:structuredClone(S.wallets),cashActual:actual,cashSystem:cash,diff});
     S.closed=true;S.closedAt=new Date().toISOString();save();
     $('closeMsg').innerHTML=`<span class="ok">تم التقفيل — النظام ${fmt(cash)} — الفعلي ${fmt(actual)} — الفرق ${fmt(diff)}</span>`;toast('تم التقفيل');
   });
 }
-function newDay(){requirePin(()=>{if(!confirm('بدء يوم جديد؟ سيتم تصفير العمليات (الأرشيف محفوظ).'))return;S.ops=[];S.expenses=[];S.debts=[];S.closed=false;S.closedAt=null;save();toast('تم بدء يوم جديد')})}
+function newDay(){
+  requirePin(()=>{
+    if(!confirm('بدء يوم جديد؟ سيتم تصفير العمليات والمصروفات (الديون والأرشيف محفوظين).'))return;
+    S.ops=[];S.expenses=[];
+    // S.debts = []; // تم إيقاف مسح الديون عشان تفضل زي ما هي
+    S.closed=false;S.closedAt=null;
+    save();toast('تم بدء يوم جديد');
+  });
+}
 
 /* ================== الرسوم البيانية ================== */
 function drawCharts(){drawSalesChart();drawProfitChart()}
