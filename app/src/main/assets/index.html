@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Fazlaka Pay Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -18,7 +18,15 @@
   --line:#1e4a4c; --shadow:0 2px 10px rgba(0,0,0,.4); --brand-light:#0f3d3a;
 }
 *{box-sizing:border-box;font-family:Cairo,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--ink);padding-bottom:96px;transition:.2s}
+body{margin:0;background:var(--bg);color:var(--ink);transition:.2s;overflow-x:hidden}
+#loginScreen{position:fixed;inset:0;z-index:9999;background:var(--petro);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#loginScreen .logo{font-family:'Cairo',sans-serif;font-size:42px;color:#fff;font-weight:900;margin-bottom:10px;text-shadow:0 2px 10px rgba(0,0,0,.3)}
+#loginScreen h2{color:#fff;margin:0 0 30px;font-size:24px;font-weight:700}
+#loginScreen input{width:100%;max-width:300px;padding:15px;border-radius:12px;border:none;font-size:20px;text-align:center;letter-spacing:6px;margin-bottom:15px;background:#fff;color:#000}
+#loginScreen button{width:100%;max-width:300px;padding:15px;font-size:18px;border-radius:12px;border:none;font-weight:700;cursor:pointer;margin-bottom:12px}
+#loginBtn{background:var(--brand2);color:#fff}
+#fingerprintBtn{background:#5eead4;color:var(--petro);display:flex;align-items:center;justify-content:center;gap:10px}
+#app{display:none;padding-bottom:96px;background:var(--bg)}
 header{background:linear-gradient(135deg,var(--petro),var(--petro2));color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 header b{font-size:18px}
 header .date{font-size:12px;color:#a7e8e2}
@@ -86,6 +94,16 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
 </head>
 <body data-theme="light">
 
+<div id="loginScreen">
+  <div class="logo">Fazlaka</div>
+  <h2>Fazlaka Pay</h2>
+  <input type="password" id="loginPin" inputmode="numeric" placeholder="••••" maxlength="10">
+  <button id="loginBtn" onclick="login()">دخول</button>
+  <button id="fingerprintBtn" onclick="loginBiometric()">👆 دخول بالبصمة</button>
+  <p id="loginErr" class="err" style="color:#fca5a5;height:20px;margin-top:10px"></p>
+</div>
+
+<div id="app">
 <header>
   <button class="icon-btn" onclick="toggleDrawer()">☰</button>
   <div style="text-align:center"><b id="shopTitle">Fazlaka Pay</b><br><span class="date" id="headerDate"></span></div>
@@ -117,6 +135,7 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
   <button class="grey" onclick="exportCSV();toggleDrawer()">📄 تصدير CSV</button>
   <button class="grey" onclick="document.getElementById('importFile').click()">📥 استيراد</button>
   <input type="file" id="importFile" accept=".json" style="display:none" onchange="backupImport(event)">
+  <button class="danger" style="margin-top:15px" onclick="lockApp();toggleDrawer()">🔒 قفل البرنامج</button>
   <p class="small" style="margin-top:12px">البيانات محلية على جهازك — اعمل نسخة احتياطية دوريًا.</p>
 </div>
 
@@ -175,12 +194,7 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
   <div class="card">
     <h3>➕ تغذية مكنة</h3>
     <select id="topMachine"></select>
-    <select id="topFrom">
-      <option value="cash">من النقدية</option>
-      <option value="instapay">من إنستاباي</option>
-      <option value="vodafone">من فودافون كاش</option>
-      <option value="fawryWallet">من محفظة فوري</option>
-    </select>
+    <select id="topFrom"></select>
     <input id="topAmt" type="number" min="1" placeholder="مبلغ التغذية">
     <button onclick="doTopup()">تغذية</button>
     <p id="topMsg"></p>
@@ -282,7 +296,7 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
 <div class="modal" id="genericModal"><div class="box" id="modalBody"></div></div>
 
 <script>
-const STORE_KEY='fazlaka_v4';
+const STORE_KEY='fazlaka_v5';
 const DEFAULT={
   machines:{fawry_main:0,fawry_cards:0,fawry_cashout:0,basata:0,mobile:0,cash_egypt:0},
   machineNames:{fawry_main:'فوري رئيسي',fawry_cards:'فوري كروت',fawry_cashout:'فوري كاش أوت',basata:'بساطة',mobile:'موبايل',cash_egypt:'كاش مصر'},
@@ -311,11 +325,59 @@ function toggleTheme(){S.theme=S.theme==='dark'?'light':'dark';applyTheme();save
 function toggleDrawer(){$('drawer').classList.toggle('open');$('overlay').classList.toggle('show')}
 function show(p){['machine','sales','wallets','reports'].forEach(x=>{$('page-'+x).style.display=x===p?'block':'none';const n=$('nav-'+x);if(n)n.classList.toggle('active',x===p)});if(p==='reports')drawCharts()}
 function setOp(o){S.op=o;save();$('opRecharge').style.display=o==='recharge'?'block':'none';$('opCards').style.display=o==='cards'?'block':'none';$('opBills').style.display=o==='bills'?'block':'none';$('btnRechargeTab').className=o==='recharge'?'':'grey';$('btnCardsTab').className=o==='cards'?'':'grey'}
+  /* ================== الدخول والبصمة ================== */
+function login(){
+  const pin = $('loginPin').value;
+  if(pin === S.pin){
+    $('loginScreen').style.display='none';
+    $('app').style.display='block';
+    applyTheme(); render();
+    $('loginErr').textContent='';
+    $('loginPin').value='';
+  } else {
+    $('loginErr').textContent='رمز الدخول خاطئ';
+  }
+}
+function lockApp(){
+  $('app').style.display='none';
+  $('loginScreen').style.display='flex';
+  $('loginPin').value='';
+  $('loginErr').textContent='';
+}
+async function loginBiometric(){
+  if(!window.PublicKeyCredential){ $('loginErr').textContent = 'البصمة غير مدعومة على هذا المتصفح'; return; }
+  try {
+    if(!localStorage.getItem('fazlaka_cred')) {
+      const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+      const user = { id: new Uint8Array(16), name: "admin", displayName: "Admin" };
+      const cred = await navigator.credentials.create({ publicKey: { challenge, rp: { name: "Fazlaka Pay" }, user, pubKeyCredParams: [{ alg: -7, type: "public-key" }], authenticatorSelection: { userVerification: "required", authenticatorAttachment: "platform" } }});
+      localStorage.setItem('fazlaka_cred', btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
+      $('loginErr').style.color = '#6ee7b7';
+      $('loginErr').textContent = 'تم تفعيل البصمة! اضغط دخول بالبصمة مرة أخرى.';
+      return;
+    }
+    const rawId = Uint8Array.from(atob(localStorage.getItem('fazlaka_cred')), c => c.charCodeAt(0));
+    const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+    await navigator.credentials.get({ publicKey: { challenge, allowCredentials: [{ type: "public-key", id: rawId }], userVerification: "required" }});
+    $('loginScreen').style.display='none';
+    $('app').style.display='block';
+    applyTheme(); render();
+    $('loginErr').style.display='none';
+  } catch(e) { $('loginErr').style.color = '#fca5a5'; $('loginErr').textContent = 'فشل التحقق بالبصمة'; }
+}
+
+/* ================== PIN للعمليات ================== */
 let pinCallback=null;
-function requirePin(cb){if(!S.pinEnabled){cb();return}pinCallback=cb;$('modalBody').innerHTML='<h3>🔒 رمز المدير</h3><input id="pinInput" type="password" inputmode="numeric" placeholder="PIN" style="text-align:center;font-size:22px;letter-spacing:6px"><p id="pinErr" class="err" style="min-height:18px"></p><div class="row"><button class="grey" onclick="closeModal()">إلغاء</button><button onclick="submitPin()">تأكيد</button></div>';$('genericModal').classList.add('show');setTimeout(()=>$('pinInput').focus(),100)}
+function requirePin(cb){
+  if(!S.pinEnabled){cb();return}
+  pinCallback=cb;
+  $('modalBody').innerHTML='<h3>🔒 رمز المدير</h3><input id="pinInput" type="password" inputmode="numeric" placeholder="PIN" style="text-align:center;font-size:22px;letter-spacing:6px"><p id="pinErr" class="err" style="min-height:18px"></p><div class="row"><button class="grey" onclick="closeModal()">إلغاء</button><button onclick="submitPin()">تأكيد</button></div>';
+  $('genericModal').classList.add('show');setTimeout(()=>$('pinInput').focus(),100);
+}
 function submitPin(){if($('pinInput').value===String(S.pin)){closeModal();const cb=pinCallback;pinCallback=null;if(cb)cb()}else{$('pinErr').textContent='رمز خاطئ'}}
 function closeModal(){$('genericModal').classList.remove('show');pinCallback=null}
-  /* ================== العمليات ================== */
+
+/* ================== العمليات ================== */
 function addOp(type,deduct,sell,profit,detail){S.ops.push({type,deduct,sell,profit,detail,time:new Date().toLocaleString('ar-EG'),ts:Date.now()})}
 function payEffect(pay,amount,profit,detail){
   if(pay==='نقدي')S.wallets.cash.in+=amount;
@@ -323,9 +385,12 @@ function payEffect(pay,amount,profit,detail){
   else if(pay==='إنستاباي')S.wallets.instapay.in+=amount;
   else if(pay==='آجل (دين)')S.debts.push({name:(detail.split('|')[0]||'زبون').trim(),amount});
 }
+
+/* ================== المكن ================== */
 function calcRecharge(){const a=num($('rAmt').value);const d=a*S.rates.rechargeDeduct;const s=a*S.rates.rechargeSell;$('rDeduct').textContent=fmt(d);$('rSell').textContent=fmt(s);$('rProfit').textContent=fmt(s-d)}
 function setAmt(a){$('rAmt').value=a;calcRecharge()}
 function setCard(i){const c=S.rates.cards[i];S.card={v:c.v,s:c.s};$('cVal').value=c.v;$('cSell').value=c.s}
+
 function doRecharge(){
   requirePin(()=>{
     if(S.closed)return toast('اليوم مقفل');
@@ -378,20 +443,29 @@ function doTopup(){
     $('topAmt').value='';$('topMsg').innerHTML=`<span class="ok">تم تغذية ${machineName(m)} بـ ${fmt(a)}</span>`;toast('تمت التغذية');
   });
 }
-function addProduct(){const n=$('pName').value.trim(),q=num($('pQty').value),b=num($('pBuy').value),s=num($('pSell').value);if(!n||!q)return toast('اكتب اسم وكمية');S.products.push({n,q,b,s});$('pName').value='';$('pQty').value='';$('pBuy').value='';$('pSell').value='';save();toast('تمت الإضافة')}
+
+/* ================== المبيعات ================== */
+function addProduct(){
+  if(S.closed)return toast('اليوم مقفل');
+  const n=$('pName').value.trim(),q=num($('pQty').value),b=num($('pBuy').value),s=num($('pSell').value);
+  if(!n||!q)return toast('اكتب اسم وكمية');
+  S.products.push({n,q,b,s});$('pName').value='';$('pQty').value='';$('pBuy').value='';$('pSell').value='';save();toast('تمت الإضافة')
+}
 function sellProduct(i){
   if(S.closed) return toast('اليوم مقفل');
   const p=S.products[i];if(p.q<=0)return toast('الكمية صفر');
   p.q--;S.wallets.cash.in+=p.s;addOp('منتج',p.b,p.s,p.s-p.b,p.n);save();toast('تم بيع '+p.n)
 }
+
+/* ================== المحافظ ================== */
 function addWalletTx(){
   const k=$('wSelect').value,type=$('wType').value,a=num($('wAmt').value),reason=$('wReason').value.trim(),person=$('wPerson').value.trim();
-  if(S.closed) return toast('اليوم مقفل — لا يمكن إضافة معاملات'); // منع التعديل بعد التقفيل
+  if(S.closed) return toast('اليوم مقفل — لا يمكن إضافة معاملات');
   if(!a||!reason)return toast('اكتب المبلغ والسبب');
   if(type==='out'){
     const left=walletLeft(k);
     if(left!=null&&left<a) return toast('وصلت لليميت');
-    if(walletBal(k) < a) return toast('الرصيد غير كافي في ' + walletName(k)); // منع السالب
+    if(walletBal(k) < a) return toast('الرصيد غير كافي في ' + walletName(k));
     S.wallets[k].out+=a;
   } else S.wallets[k].in+=a;
   S.ops.push({type:type==='in'?'داخل '+walletName(k):'خارج '+walletName(k),deduct:0,sell:a,profit:0,detail:reason+(person?' | '+person:''),time:new Date().toLocaleString('ar-EG'),ts:Date.now()});
@@ -406,25 +480,42 @@ function addWallet(){
     S.wallets[key] = {in:0, out:0, limit:200000};
     S.walletNames[key] = n;
     $('newWalletName').value = '';
-    save();
-    toast('تمت إضافة المحفظة');
+    save(); toast('تمت إضافة المحفظة');
   });
 }
+
+/* ================== التقارير ================== */
 function addExpense(){
-  if(S.closed) return toast('اليوم مقفل'); // منع التعديل بعد التقفيل
+  if(S.closed) return toast('اليوم مقفل');
   const a=num($('exAmt').value),r=$('exReason').value.trim();
   if(!a||!r)return toast('اكتب المبلغ والسبب');
-  if(walletBal('cash') < a) return toast('الكاش غير كافي'); // منع السالب
+  if(walletBal('cash') < a) return toast('الكاش غير كافي'); 
   S.expenses.push({a,r,time:new Date().toLocaleString('ar-EG'),ts:Date.now()});
   S.wallets.cash.out+=a;
   S.ops.push({type:'مصروف',deduct:0,sell:a,profit:-a,detail:r,time:new Date().toLocaleString('ar-EG'),ts:Date.now()});
   $('exAmt').value='';$('exReason').value='';save();toast('تم حفظ المصروف');
 }
-function addDebt(){const n=$('dName').value.trim(),a=num($('dAmt').value);if(!n||!a)return toast('اكتب الاسم والمبلغ');S.debts.push({name:n,amount:a,ts:Date.now()});$('dName').value='';$('dAmt').value='';save();toast('تم حفظ الدين')}
-function payDebt(i,a){const amt=num(prompt('مبلغ السداد',a));if(!amt)return;S.debts[i].amount-=amt;if(S.debts[i].amount<=0)S.debts.splice(i,1);S.wallets.cash.in+=amt;S.ops.push({type:'سداد دين',deduct:0,sell:amt,profit:0,detail:'سداد دين',time:new Date().toLocaleString('ar-EG'),ts:Date.now()});save();toast('تم السداد')}
-  function doClose(){
+function addDebt(){
+  if(S.closed) return toast('اليوم مقفل');
+  const n=$('dName').value.trim(),a=num($('dAmt').value);
+  if(!n||!a)return toast('اكتب الاسم والمبلغ');
+  S.debts.push({name:n,amount:a,ts:Date.now()});
+  $('dName').value='';$('dAmt').value='';save();toast('تم حفظ الدين')
+}
+function payDebt(i,a){
+  if(S.closed) return toast('اليوم مقفل');
+  const amt=num(prompt('مبلغ السداد',a));
+  if(!amt)return;
+  if(amt > a) return toast('المبلغ أكبر من الدين!'); // منع السداد الزيادة
+  S.debts[i].amount-=amt;
+  if(S.debts[i].amount<=0)S.debts.splice(i,1);
+  S.wallets.cash.in+=amt;
+  S.ops.push({type:'سداد دين',deduct:0,sell:amt,profit:0,detail:'سداد دين',time:new Date().toLocaleString('ar-EG'),ts:Date.now()});
+  save();toast('تم السداد');
+}
+function doClose(){
   requirePin(()=>{
-    if(S.closed) return toast('اليوم مقفل بالفعل'); // منع التكرار
+    if(S.closed) return toast('اليوم مقفل بالفعل');
     const actual=num($('actualCash').value),cash=cashBal(),diff=actual-cash;
     S.archive.push({date:todayStr(),ops:structuredClone(S.ops),expenses:structuredClone(S.expenses),debts:structuredClone(S.debts),machines:structuredClone(S.machines),wallets:structuredClone(S.wallets),cashActual:actual,cashSystem:cash,diff});
     S.closed=true;S.closedAt=new Date().toISOString();save();
@@ -435,13 +526,12 @@ function newDay(){
   requirePin(()=>{
     if(!confirm('بدء يوم جديد؟ سيتم تصفير العمليات والمصروفات (الديون والأرشيف محفوظين).'))return;
     S.ops=[];S.expenses=[];
-    // S.debts = []; // تم إيقاف مسح الديون عشان تفضل زي ما هي
+    // S.debts = []; // لا تمسح الديون
     S.closed=false;S.closedAt=null;
     save();toast('تم بدء يوم جديد');
   });
 }
-
-/* ================== الرسوم البيانية ================== */
+  /* ================== الرسوم البيانية ================== */
 function drawCharts(){drawSalesChart();drawProfitChart()}
 function drawSalesChart(){
   const canvas=$('chartSales');if(!canvas)return;
@@ -498,9 +588,9 @@ function openSettings(){
     html+=`<input data-setting="rate:rechargeSell" type="number" step="0.01" value="${S.rates.rechargeSell}" placeholder="نسبة البيع">`;
     html+='<h3>أسعار الكروت</h3>';
     S.rates.cards.forEach((c,i)=>{html+=`<div class="row"><input data-setting="card:${i}:v" type="number" value="${c.v}" placeholder="القيمة"><input data-setting="card:${i}:s" type="number" value="${c.s}" placeholder="البيع"></div>`});
-    html+='<h3>رمز المدير</h3>';
+    html+='<h3>رمز الدخول (PIN)</h3>';
     html+=`<input data-setting="pin" value="${S.pin}" placeholder="PIN">`;
-    html+=`<label class="small" style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" data-setting="pinEnabled" ${S.pinEnabled?'checked':''} style="width:auto"> تفعيل طلب الرمز</label>`;
+    html+=`<label class="small" style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" data-setting="pinEnabled" ${S.pinEnabled?'checked':''} style="width:auto"> تفعيل طلب الرمز عند العمليات الحساسة</label>`;
     html+=`<div class="row" style="margin-top:14px"><button class="grey" onclick="closeModal()">إغلاق</button><button class="green" onclick="saveSettings()">حفظ</button></div>`;
     $('modalBody').innerHTML=html;$('genericModal').classList.add('show');
   });
@@ -522,7 +612,7 @@ function saveSettings(){
 /* ================== القفل التلقائي ================== */
 let lastActivity=Date.now();
 ['click','input','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,()=>lastActivity=Date.now(),{passive:true}));
-setInterval(()=>{if(S.pinEnabled&&!$('genericModal').classList.contains('show')&&Date.now()-lastActivity>5*60*1000){requirePin(()=>{});lastActivity=Date.now()}},30000);
+setInterval(()=>{if(S.pinEnabled && !$('genericModal').classList.contains('show') && Date.now()-lastActivity > 5*60*1000){lockApp();lastActivity=Date.now()}},30000);
 
 /* ================== العرض ================== */
 function render(){
@@ -535,12 +625,16 @@ function render(){
   $('kOps').textContent=S.ops.length;
   $('machines').innerHTML=Object.keys(S.machines).map(k=>{const max=Math.max(...Object.values(S.machines),1);const pct=Math.min(100,(S.machines[k]/max)*100);return `<div class="machine ${S.selected===k?'active':''}" onclick="S.selected='${k}';save()">${machineName(k)}<br><b>${fmt(S.machines[k])}</b><div class="bar"><i style="width:${pct}%"></i></div></div>`}).join('');
   $('machineInfo').textContent='المكنة المختارة: '+machineName(S.selected)+' — الرصيد '+fmt(S.machines[S.selected]);
+  
+  // تحديث قائمة المكن في التغذية وقائمة المحافظ (بما فيها الجديدة)
   $('topMachine').innerHTML=Object.keys(S.machines).map(k=>`<option value="${k}">${machineName(k)} — ${fmt(S.machines[k])}</option>`).join('');
+  $('topFrom').innerHTML=Object.keys(S.wallets).map(k=>`<option value="${k}">من ${walletName(k)}</option>`).join('');
+  $('wSelect').innerHTML=Object.keys(S.wallets).map(k=>`<option value="${k}">${walletName(k)}</option>`).join('');
+
   $('quickAmts').innerHTML=[10,20,50,100].map(a=>`<div class="opt" onclick="setAmt(${a})">${a}</div>`).join('');
   $('quickCards').innerHTML=S.rates.cards.map((c,i)=>`<div class="opt" onclick="setCard(${i})">${c.v} - ${c.s}</div>`).join('');
   $('products').innerHTML=S.products.map((p,i)=>`<div class="list-item"><span>${p.n} — كمية ${p.q} — بيع ${fmt(p.s)}</span><button class="green" style="width:auto;padding:8px 14px;margin:0" onclick="sellProduct(${i})">بيع</button></div>`).join('')||'<p class="small">لا توجد منتجات</p>';
   $('wallets').innerHTML=Object.keys(S.wallets).map(k=>{const w=S.wallets[k],left=walletLeft(k);return `<div style="border:1px solid var(--line);border-radius:12px;padding:10px;margin:6px 0"><b>${walletName(k)}</b><br>الرصيد: ${fmt(walletBal(k))}<br>الليميت: ${w.limit==null?'بدون':fmt(w.limit)} — المتبقي: ${left==null?'بدون':fmt(left)}</div>`}).join('');
-  $('wSelect').innerHTML=Object.keys(S.wallets).map(k=>`<option value="${k}">${walletName(k)}</option>`).join('');
   $('walletTxList').innerHTML=S.ops.slice(-10).reverse().map(o=>`<div style="border-bottom:1px solid var(--line);padding:6px;font-size:13px">${o.time} — ${o.type} — ${fmt(o.sell)} — ${o.detail}</div>`).join('');
   $('repSales').textContent=fmt(S.ops.reduce((s,o)=>s+(o.sell||0),0));
   $('repProfit').textContent=fmt(profit);
