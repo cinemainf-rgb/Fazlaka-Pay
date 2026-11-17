@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" style="direction: rtl;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Fazlaka Pay Pro</title>
-<link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    direction: rtl !important;
+    text-align: right;
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+</style>
 <style>
 :root{
   --bg:#f0f7f7; --card:#fff; --ink:#0b3d3f; --muted:#5b7a7c;
@@ -18,8 +27,8 @@
   --bg:#0a1f20; --card:#103234; --ink:#e6f4f3; --muted:#8fb0b1;
   --line:#1e4a4c; --shadow:0 2px 10px rgba(0,0,0,.4); --brand-light:#0f3d3a;
 }
-*{box-sizing:border-box;font-family:Cairo,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--ink);transition:.2s;overflow-x:hidden}
+*{box-sizing:border-box;font-family:Cairo,Arial,sans-serif;-webkit-tap-highlight-color:transparent; direction: rtl;}
+body{margin:0;background:var(--bg);color:var(--ink);transition:.2s;overflow-x:hidden; direction: rtl;}
 #loginScreen{position:fixed;inset:0;z-index:9999;background:var(--petro);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
 #loginScreen .logo{width:200px; max-width:80%; margin-bottom:20px; filter: brightness(0) invert(1); opacity: 0.9;}
 #loginScreen h2{color:#fff;margin:0 0 30px;font-size:24px;font-weight:700}
@@ -29,8 +38,7 @@ body{margin:0;background:var(--bg);color:var(--ink);transition:.2s;overflow-x:hi
 #fingerprintBtn{background:#5eead4;color:var(--petro);display:flex;align-items:center;justify-content:center;gap:10px}
 #app{display:none;padding-bottom:96px;background:var(--bg)}
 header{background:linear-gradient(135deg,var(--petro),var(--petro2));color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-header .brand{display:flex; align-items:center; gap:8px;}
-header .brand img{height:30px; filter: brightness(0) invert(1);}
+header .brand{display:flex; flex-direction: column; align-items: center; justify-content: center;}
 header b{font-size:18px}
 header .date{font-size:12px;color:#a7e8e2}
 header .icon-btn{background:rgba(255,255,255,.12);border:none;color:#fff;width:42px;height:42px;border-radius:12px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative}
@@ -62,11 +70,11 @@ button.gold{background:linear-gradient(135deg,#b8860b,var(--gold))}
 .small{color:var(--muted);font-size:12px}
 .ok{color:var(--ok);font-weight:700}
 .err{color:var(--danger);font-weight:700}
-.machine{padding:12px 10px;border-radius:14px;background:var(--bg);text-align:center;cursor:pointer;border:2px solid transparent;font-size:13px;position:relative}
+.machine{padding:12px 10px;border-radius:14px;background:var(--bg);text-align:center;cursor:pointer;border:2px solid transparent;font-size:13px;position:relative; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
 .machine.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
 .machine.low-balance{border-color:var(--danger);animation:pulse-red 2s infinite}
 @keyframes pulse-red{0%{box-shadow:0 0 0 0 rgba(220,38,38,0.7)}70%{box-shadow:0 0 0 10px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
-.machine .bar{height:5px;border-radius:4px;background:var(--line);margin-top:8px;overflow:hidden}
+.machine .bar{height:5px;border-radius:4px;background:var(--line);margin-top:8px;overflow:hidden; width: 80%;}
 .machine .bar i{display:block;height:100%;background:var(--gold);border-radius:4px}
 .machine.active .bar{background:rgba(255,255,255,.3)}
 .machine.active .bar i{background:#fff}
@@ -123,7 +131,7 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
 <div id="app">
 <header>
   <button class="icon-btn" onclick="toggleDrawer()">☰</button>
-  <div class="brand" style="flex-direction:column;">
+  <div class="brand">
     <b id="shopTitle">Fazlaka Pay</b>
     <span class="date" id="headerDate"></span>
   </div>
@@ -364,7 +372,7 @@ nav button.active{background:var(--brand-light);color:var(--brand)}
 <div class="modal" id="genericModal"><div class="box" id="modalBody"></div></div>
 
 <script>
-  const STORE_KEY='fazlaka_v10';
+  const STORE_KEY='fazlaka_v11';
 const DEFAULT={
   machines:{fawry_main:0,fawry_cards:0,fawry_cashout:0,basata:0,mobile:0,cash_egypt:0},
   machineNames:{fawry_main:'فوري رئيسي',fawry_cards:'فوري كروت',fawry_cashout:'فوري كاش أوت',basata:'بساطة',mobile:'موبايل',cash_egypt:'كاش مصر'},
@@ -374,7 +382,7 @@ const DEFAULT={
   rates:{rechargeDeduct:1.43,rechargeSell:1.5,cards:[{v:22.5,s:24},{v:15,s:18},{v:19,s:22},{v:30,s:32}]},
   products:[],debts:[],ops:[],expenses:[],archive:[],
   closed:false,closedAt:null,selected:'fawry_main',op:'recharge',card:{v:0,s:0},
-  pin:'1234',pinEnabled:false,shopName:'Fazlaka Pay',theme:'light',filter:'all',maintenance:false,
+  pin:'hash_MTIzNA==',pinEnabled:false,shopName:'Fazlaka Pay',theme:'light',filter:'all',maintenance:false,
   lastAction:null, lastBackupDate:null
 };
 let S=load();
@@ -424,10 +432,6 @@ function toggleMaintenance(){
   });
 }
 
-/* ================== التشفير ================== */
-const b64 = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-const unb64 = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0));
-
 /* ================== الدخول والبصمة ================== */
 function enterApp(){
   $('loginScreen').style.display = 'none';
@@ -462,7 +466,7 @@ function enterApp(){
       localStorage.setItem('askedOpening_' + todayStr(),'true');
       
       // تغيير PIN الإجباري
-      if(S.pin === 'hash_' + btoa('1234')){
+      if(S.pin === 'hash_MTIzNA=='){
         setTimeout(()=>{
           const newPin = prompt('أمان المحل: يجب تغيير رمز الدخول الافتراضي (1234) الآن.\nأدخل رمز جديد (أرقام فقط):');
           if(newPin && newPin.length >= 4) {
@@ -480,7 +484,7 @@ function enterApp(){
 
 function login(){
   const pin = $('loginPin').value;
-  if('hash_' + btoa(pin) === S.pin || pin === S.pin){ // للتوافق مع النسخ القديمة
+  if('hash_' + btoa(pin) === S.pin || pin === S.pin){ 
     if(pin === S.pin) { S.pin = 'hash_' + btoa(pin); save(); }
     enterApp();
   } else {
@@ -495,38 +499,25 @@ function lockApp(){
   $('loginErr').textContent='';
 }
 
+// دالة البصمة المربوطة بتطبيق الفلاتر
 async function loginBiometric(){
-  if(!window.PublicKeyCredential || !navigator.credentials) {
+  if (window.FlutterChannel && window.FlutterChannel.postMessage) {
+    window.FlutterChannel.postMessage("check_biometric");
+  } else {
     $('loginErr').style.color = '#fca5a5';
-    $('loginErr').textContent = 'البصمة غير مدعومة. لازم يكون الرابط https';
-    return;
+    $('loginErr').textContent = 'البصمة متاحة فقط داخل تطبيق الأندرويد';
   }
-  try {
-    if(!localStorage.getItem('fazlaka_cred')) {
-      const ch = new Uint8Array(32); crypto.getRandomValues(ch);
-      let uid = localStorage.getItem('uid');
-      if(!uid){ uid = b64(crypto.getRandomValues(new Uint8Array(16))); localStorage.setItem('uid',uid); }
-      
-      const c = await navigator.credentials.create({publicKey:{
-        challenge:ch, rp:{name:'Fazlaka',id:location.hostname},
-        user:{id:unb64(uid),name:'owner',displayName:'owner'},
-        pubKeyCredParams:[{alg:-7,type:'public-key'},{alg:-257,type:'public-key'}],
-        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
-        timeout:60000, attestation:'none'}});
-      localStorage.setItem('fazlaka_cred', b64(c.rawId));
-      $('loginErr').style.color = '#6ee7b7';
-      $('loginErr').textContent = 'تم تفعيل البصمة! اضغط دخول بالبصمة مرة أخرى.';
-      return;
-    }
-    
-    const ch = new Uint8Array(32); crypto.getRandomValues(ch);
-    await navigator.credentials.get({publicKey:{
-      challenge:ch,
-      allowCredentials:[{id:unb64(localStorage.getItem('fazlaka_cred')),type:'public-key'}],
-      userVerification:'required', timeout:60000}});
-      
-    enterApp(); 
-  } catch(e) { $('loginErr').style.color = '#fca5a5'; $('loginErr').textContent = 'فشل التحقق بالبصمة'; }
+}
+
+// الفلاتر هتنادي على الدالة دي لما البصمة تنجح
+function onBiometricSuccess() {
+  enterApp();
+}
+
+// الفلاتر هتنادي على الدالة دي لما البصمة تفشل
+function onBiometricFailed() {
+  $('loginErr').style.color = '#fca5a5';
+  $('loginErr').textContent = 'فشل التحقق بالبصمة';
 }
 
 let pinCallback=null;
@@ -1117,12 +1108,12 @@ setOp('recharge');
 </html>
 
 function printReceipt(html){
-  // فلاتر WebView
+  // ربط الطباعة بتطبيق الفلاتر
   if (window.FlutterChannel && window.FlutterChannel.postMessage) {
     window.FlutterChannel.postMessage(html);
     return;
   }
-  // طباعة المتصفح العادية (58mm)
+  // طباعة المتصفح العادية كاحتياطي
   const w = window.open('','_blank');
   w.document.write(`<style>
     @page{size:58mm auto;margin:0}
